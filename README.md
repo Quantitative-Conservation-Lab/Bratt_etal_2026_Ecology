@@ -1,156 +1,63 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-## Effects of species life history and data availability on integrate population model performance
+## Effects of species life history and data availability on integrated population model performance
 
-Abby E. Bratt, Caroline D. Cappello, Amelia J. DuVall, Hannah A. Sipe,
-Amanda J. Warlick, Beth Gardner, Sarah J. Converse
 
-Code provided for peer review
+Abby E. Bratt, Caroline D. Cappello, Amelia J. DuVall, Hannah A. Sipe, Amanda J.
+Warlick, Beth Gardner, Sarah J. Converse
+
 
 ## Abstract
 
-Integrated population models (IPMs) are an increasingly popular tool for
-population modeling in ecology. By combining datasets in a unified
-analysis, IPMs link demographic rates with population dynamics and can
-thereby reduce bias, improve precision, and estimate parameters that
-would otherwise be unidentifiable using traditional approaches. However,
-the performance of IPMs in different situations remains underexplored
-and the conditions under which IPMs produce more precise estimates
-compared with those produced in singular analyses are poorly understood.
+Integrated population models (IPMs) can reduce bias, improve precision, and estimate parameters that would otherwise be unidentifiable and are therefore an increasingly popular tool for population modeling in ecology. However, the conditions under which IPMs yield these benefits is an active area of research. We simulated data across a range of life history strategies, population trajectories, and survey effort scenarios typical of a passerine monitoring program and examined model performance when count, mark-resight, and productivity datasets were included versus when datasets were omitted or were of poorer quality. In addition to parameter estimates having greater bias and lower precision when datasets directly informing those parameters were omitted, our results showed poorer vital rate estimation in scenarios where data were generated for a slow life history strategy and a decreasing abundance trend. In terms of abundance trend estimation, increasing count survey detection probability was more effective at reducing uncertainty in population growth rates than including additional datasets or having a longer monitoring period. This work informs the ongoing exploration of the benefits of IPMs and suggests that practitioners consider the context of a given species and monitoring program when determining whether investing in multiple datasets versus improving the quality of a single dataset will yield sufficiently precise parameter estimates that most efficiently answer pertinent ecological or management questions of interest.
 
-We assessed the performance of IPMs across a range of life history
-parameters, population trajectories, and data availability scenarios
-using simulated count, mark-resight, and productivity data typical of a
-passerine monitoring program. We examined relative bias and root mean
-squared error for abundance, trend in abundance, survival, and fecundity
-across models when all datasets were included versus when one or two
-datasets were omitted or when the included datasets were of poorer
-quality (i.e., lower detection probabilities).
-
-Parameter estimates generally showed higher bias when the datasets that
-more directly informed those parameters were omitted or when the true
-data-generating parameters were representative of more extreme life
-history traits (e.g., high survival and low reproduction that
-characterizes large mammals or the lower survival and higher
-reproductive output that characterizes insects or amphibians). Higher
-detection probabilities alone did little to reduce bias in demographic
-rates. However, higher detection probabilities in count surveys were
-more effective at reducing uncertainty in abundance trends than using
-more of the available datasets.
-
-Our results suggest that the unique context of a given monitoring
-program and study species will largely determine whether collecting
-multiple data streams versus collecting a single high-quality data
-stream (e.g., increasing detection probabilities or sample sizes) will
-most improve parameter estimates. Practitioners should carefully
-consider the best ways of answering the specific ecological or
-management questions of interest (e.g., estimating demographic rates
-versus detecting trends) given the species’ life history and the costs
-of data collection. This work provides a foundation from which to
-further explore the performance of IPMs and to inform the design of
-monitoring programs while considering the costs and benefits of data
-collection.
 
 ## Scripts, current version
 
-### 0 - preparing scenarios
-
-##### compute_time_calc.R
-
-Code for approximating the total run time, given number of simulated
-datasets, number of parameter scenarios, computer cores, and estimated
-run time for each model.
+### 1 - preparing scenarios
 
 ##### generate_scenarios.R
 
-Function ‘getNviable’ for finding the combinations of parameters that
-give a population growth rate ($\lambda$) within certain bounds, using
-the eigenvalue from the Leslie matrix. The output from this function
-produces the parameter scenarios used to simulate population
-trajectories, observation data from the trajectories, and fit the the
-IPM models.
-
-### 1 - simulating data
-
-##### IPM_sim_2.0function.R
-
-Script contains two functions for simulating data: ‘simPopTrajectory’
-and ‘simData’.
-
-The ‘simPopTrajectory’ function simulates the true population trajectory
-by individual and age class, starting from the stable age distribution.
-Individual fates are retained throughout total number of years.
-
-The ‘simData’ function uses the output from the ‘simPopTrajectory’
-function to simulate the observation process for each data type. The
-true individual data is broken down into independent sets, each is
-subject to observation error. Mark-resight, count, and reproductive
-success data are output from this function.
-
-##### simulateTrajectories.R
-
-Script that pulls from the scenarios that were created in ‘0 - preparing
-scenarios’ and the functions in IPM_sim_2.0function.R to simulate
-observation data sets for model fitting.
+Function 'getNviable' for finding the combinations of parameters that give a population growth rate ($\lambda$) within certain bounds, using the eigenvalue from the Leslie matrix. The output from this function produces the parameter scenarios used to simulate population trajectories, observation data from the trajectories, and fit the the IPM models. 
 
 ### 2 - models
 
-##### IPMinitvalues.R
-
-Functions for putting data in the form required by the survival model.
-
 ##### IPM_marray.R
+Script contains 4 IPM NIMBLE models. 
 
-Script contains 4 IPM NIMBLE models.
-
-1.  full IPM model (‘IPMmod’) where all three datasets are included
-2.  model without productivity dataset (‘nonests’)
-3.  model without survival model (‘nomr’)
-4.  abundance only model without productivity or survival (‘abundonly’)
+ 1. full IPM model ('IPMmod') where all three datasets are included
+ 2. model without productivity dataset ('nonests')
+ 3. model without survival model ('nomr')
+ 4. abundance only model without productivity or survival ('abundonly')
 
 ### 3 - run models
 
 ##### run_scenarios_helperFns.R
 
-Script with functions and code to run NIMBLE models. Function ‘marray’
-transforms the survival data capture histories to m-array format. MCMC
-settings in this script, with functions for each of the 4 models. Each
-model has a run model function that defines constants, initial values,
-data, parameters to monitor, and code to build/run the models in NIMBLE.
+Script with functions and code to run NIMBLE models. Function 'marray' transforms the survival data capture histories to m-array format. MCMC settings in this script, with functions for each of the 4 models. Each model has a run model function that defines constants, initial values, data, parameters to monitor, and code to build/run the models in NIMBLE. 
 
 ##### run_scenarios.R
 
-Main workhorse script that pulls from the scripts above to run models in
-parallel and output results.
+Main workhorse script that simulates data and pulls from the scripts above to run models in parallel and output results. 
 
 ### 4 - process results
 
 ##### 01_load_and_process_data.R
 
-Script that checks the Gelman-Rubin convergence statistic for each
-output MCMC sample, then thins the chains to reduce file size and places
-the output into categories based on the population growth rate,
-$\lambda$.
+Script that checks the Gelman-Rubin convergence statistic for each output MCMC sample, then thins the chains to reduce file size and places the output into categories based on the population growth rate, $\lambda$. 
 
 ##### 02_compute_geom_means.R
 
-Computes the geometric means for $\lambda$ in each MCMC output.
+Computes the geometric means for $\lambda$ in each MCMC output. 
 
 ## Data
 
-Contains true parameter scenarios used to simulate population
-trajectories and observation data, all viable parameter combinations in
-files ‘-.lam.combos.RDS’ and the selected parameter combinations used to
-simulate data are in files ‘-.lam.params.RDS’ *(where “-” is low, med,
-or high)*. Folders labeled ‘-Trajectories’ contain the simulated
-population trajectories for each of the scenarios found in
-‘-.lam.params.RDS’. Each simulated trajectory is labeled with the
-scenario and the simulation number for that scenario. For example, in
-the ‘highTrajectory’ folder: ‘highpopTraj-1-2.RDS’ corresponds to the
-first parameter scenario in ‘high.lam.param.RDS’ and is the second
-population trajectory simulated using those parameter values.
+Contains demographic scenarios (combinations of abundance trend and life history traits) and survey scenarios (data availability and detection levels). 
 
-File ‘true.vals.csv’ is the true parameter values used in each scenario.
-‘scenario_ID.csv’ tracks the combinations of detection probabilities and
-IPM models.
+
+
+
+
+
+
