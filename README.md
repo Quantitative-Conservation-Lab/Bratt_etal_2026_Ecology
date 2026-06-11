@@ -7,6 +7,8 @@
 Abby E. Bratt, Caroline D. Cappello, Amelia J. DuVall, Hannah A. Sipe, Amanda J.
 Warlick, Beth Gardner, Sarah J. Converse
 
+Citation: Bratt, AE, Cappello, CD, DuVall, AJ, Sipe, HA, Warlick, AJ, Gardner, B, Converse, SJ. Effects of species life history and data availability on integrated population model performance. *Ecology*.
+
 
 ## Abstract
 
